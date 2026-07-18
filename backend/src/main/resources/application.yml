@@ -1,0 +1,59 @@
+server:
+  port: ${PORT:8080}
+  servlet:
+    session:
+      cookie:
+        same-site: none
+        secure: true
+
+spring:
+  application:
+    name: life-tracker-api
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/life_tracker}
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:changeme}
+            client-secret: ${GOOGLE_CLIENT_SECRET:changeme}
+            scope:
+              - email
+              - profile
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+app:
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
+  jwt:
+    secret: ${JWT_SECRET:change-this-to-a-long-random-secret-at-least-32-chars}
+    cookie-name: lt_session
+    expiration-days: 30
+  cookie:
+    secure: ${COOKIE_SECURE:false}
+    same-site: ${COOKIE_SAME_SITE:Lax}
+  mail-from: ${MAIL_FROM:${MAIL_USERNAME:}}
+  demo-login-enabled: ${DEMO_LOGIN_ENABLED:true}
+  google-oauth-enabled: ${GOOGLE_OAUTH_ENABLED:false}
+  reminder-poll-ms: ${REMINDER_POLL_MS:60000}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+logging:
+  level:
+    com.lifetracker: INFO

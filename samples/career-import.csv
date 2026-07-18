@@ -1,0 +1,5 @@
+type,title,description,priority,status,completed
+GOAL,Become staff engineer,Lead 2 cross-team designs,1,OPEN,false
+TODO,Write design doc,Async processing RFC,2,OPEN,false
+LEARN,System design,Grokking chapter 4,3,OPEN,false
+TODO,Daily standup notes,Capture blockers,4,OPEN,false
