@@ -21,3 +21,6 @@ frontend/.env.local
 # Secrets
 **/application-local.yml
 **/secrets/
+
+backend/.env.local
+.env.local
