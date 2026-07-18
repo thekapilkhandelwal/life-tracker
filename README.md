@@ -1,3 +1,13 @@
+---
+title: Life Tracker
+emoji: 📒
+colorFrom: green
+colorTo: gray
+sdk: docker
+app_port: 8080
+pinned: false
+---
+
 # Life Tracker
 
 Personal life OS with three workspaces:

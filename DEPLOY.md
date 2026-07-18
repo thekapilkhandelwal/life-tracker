@@ -1,48 +1,49 @@
 # Deploy Life Tracker (no credit card)
 
-Koyeb’s free web hosting is no longer a good fit (product is shifting to Mistral AI). Use **Back4App Containers** instead.
+Avoid: Fly.io (billing), Koyeb (AI pivot), Back4App (blocked by MMT CCI).
 
-## 1. Image / repo (already done)
+## Option A — Hugging Face Spaces (recommended)
 
-- GitHub: https://github.com/thekapilkhandelwal/life-tracker
-- Docker image: `ghcr.io/thekapilkhandelwal/life-tracker:latest` (public)
+1. Open: https://huggingface.co/new-space  
+2. Name: `life-tracker`  
+3. SDK: **Docker**  
+4. Visibility: Public  
+5. Create Space, then **Settings → Connected Spaces / Files** or clone & push this repo, **or** Settings → sync with GitHub repo `thekapilkhandelwal/life-tracker`  
+6. Space **Settings → Variables and secrets** add:
 
-## 2. Deploy on Back4App (free, no card)
-
-1. Sign up: https://www.back4app.com/  
-2. Dashboard → **Containers** → **New App** → connect GitHub  
-3. Select repo `thekapilkhandelwal/life-tracker`  
-4. Settings:
-   - **Root directory:** `backend`
-   - **Dockerfile path:** `Dockerfile` (inside `backend`)
-5. Environment variables:
-
-| Key | Value |
-|-----|--------|
-| `MONGODB_URI` | your Atlas URI |
+| Name | Value |
+|------|--------|
+| `MONGODB_URI` | Atlas connection string |
 | `JWT_SECRET` | long random string |
-| `FRONTEND_URL` | Back4App URL after first deploy (update once you have it) |
+| `FRONTEND_URL` | `https://thekapilkhandelwal-life-tracker.hf.space` (adjust to your Space URL) |
 | `COOKIE_SECURE` | `true` |
 | `COOKIE_SAME_SITE` | `None` |
 | `DEMO_LOGIN_ENABLED` | `true` |
-| `GOOGLE_OAUTH_ENABLED` | `false` initially |
+| `GOOGLE_OAUTH_ENABLED` | `false` until OAuth is ready |
 | `PORT` | `8080` |
 
-6. Deploy → copy the public URL (looks like `https://….b4a.app`)
+7. App port in Space README frontmatter is `8080` (already set in repo root README).  
+8. After live, paste the `*.hf.space` URL here.
 
-7. Set `FRONTEND_URL` to that URL and redeploy once.
+## Option B — Render
 
-## 3. Google OAuth (after URL is live)
+1. Open: https://render.com/deploy?repo=https://github.com/thekapilkhandelwal/life-tracker  
+2. Use free web service from `render.yaml` / Docker (`backend/Dockerfile`)  
+3. Set the same env vars as above (`FRONTEND_URL` = your `*.onrender.com` URL)
 
-In [Google Cloud Console → Credentials](https://console.cloud.google.com/apis/credentials):
+> Render may ask for a card for new accounts in some regions. If it does, use Hugging Face instead.
 
-- Authorized redirect URI:  
-  `https://<your-b4a-url>/login/oauth2/code/google`
+## Google OAuth (after you have a public HTTPS URL)
 
-Then set on Back4App:
+Redirect URI:
 
-- `GOOGLE_CLIENT_ID`
-- `GOOGLE_CLIENT_SECRET`
-- `GOOGLE_OAUTH_ENABLED=true`
+```text
+https://<your-public-host>/login/oauth2/code/google
+```
 
-Send those two values here if you want them wired for you.
+Then set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_OAUTH_ENABLED=true`.
+
+## Already published
+
+- Repo: https://github.com/thekapilkhandelwal/life-tracker  
+- Image: `ghcr.io/thekapilkhandelwal/life-tracker:latest`
