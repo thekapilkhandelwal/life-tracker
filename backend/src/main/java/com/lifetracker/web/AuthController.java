@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -40,10 +41,15 @@ public class AuthController {
 
     @GetMapping("/config")
     public Map<String, Object> config() {
+        String base = Optional.ofNullable(appProperties.publicBaseUrl())
+                .filter(value -> !value.isBlank())
+                .orElse(appProperties.frontendUrl());
+        String redirectUri = base.replaceAll("/$", "") + "/login/oauth2/code/google";
         return Map.of(
                 "googleOAuthEnabled", appProperties.googleOAuthEnabled(),
                 "demoLoginEnabled", appProperties.demoLoginEnabled(),
-                "googleLoginPath", "/oauth2/authorization/google"
+                "googleLoginPath", "/oauth2/authorization/google",
+                "googleRedirectUri", redirectUri
         );
     }
 

@@ -1,5 +1,7 @@
 server:
   port: ${PORT:8080}
+  # Required behind Render/proxy so OAuth redirect_uri is https://... not http://...
+  forward-headers-strategy: framework
   servlet:
     session:
       cookie:
@@ -22,6 +24,8 @@ spring:
             scope:
               - email
               - profile
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+
   mail:
     host: ${MAIL_HOST:smtp.gmail.com}
     port: ${MAIL_PORT:587}
@@ -36,6 +40,7 @@ spring:
 
 app:
   frontend-url: ${FRONTEND_URL:http://localhost:5173}
+  public-base-url: ${PUBLIC_BASE_URL:${FRONTEND_URL:http://localhost:8080}}
   jwt:
     secret: ${JWT_SECRET:change-this-to-a-long-random-secret-at-least-32-chars}
     cookie-name: lt_session

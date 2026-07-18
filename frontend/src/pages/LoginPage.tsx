@@ -8,6 +8,7 @@ type AuthConfig = {
   googleOAuthEnabled: boolean
   demoLoginEnabled: boolean
   googleLoginPath: string
+  googleRedirectUri?: string
 }
 
 export function LoginPage() {
@@ -25,11 +26,15 @@ export function LoginPage() {
         googleOAuthEnabled: false,
         demoLoginEnabled: true,
         googleLoginPath: '/oauth2/authorization/google',
+        googleRedirectUri: `${window.location.origin}/login/oauth2/code/google`,
       }))
   }, [])
 
   if (loading) return <div className="page-loader"><Loader label="Checking session…" /></div>
   if (user) return <Navigate to="/app" replace />
+
+  const redirectUri = config?.googleRedirectUri
+    ?? `${window.location.origin}/login/oauth2/code/google`
 
   async function onDemoLogin(event: FormEvent) {
     event.preventDefault()
@@ -61,13 +66,12 @@ export function LoginPage() {
           <div className="flag warning" style={{ marginBottom: '1rem' }}>
             <strong>Google sign-in not configured yet</strong>
             <p>
-              The previous error (<code>invalid_client</code>) means Google OAuth credentials are missing.
-              Create an OAuth client in Google Cloud Console, then set
-              {' '}<code>GOOGLE_CLIENT_ID</code>, <code>GOOGLE_CLIENT_SECRET</code>, and
-              {' '}<code>GOOGLE_OAUTH_ENABLED=true</code> on the API.
+              Set <code>GOOGLE_CLIENT_ID</code>, <code>GOOGLE_CLIENT_SECRET</code>, and
+              {' '}<code>GOOGLE_OAUTH_ENABLED=true</code> on the API, then redeploy.
             </p>
             <p className="muted" style={{ marginBottom: 0 }}>
-              Redirect URI must be: <code>{`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081'}/login/oauth2/code/google`}</code>
+              In Google Cloud Console, Authorized redirect URI must be exactly:
+              {' '}<code>{redirectUri}</code>
             </p>
           </div>
         )}

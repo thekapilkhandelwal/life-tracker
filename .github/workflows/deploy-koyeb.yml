@@ -1,0 +1,68 @@
+name: Deploy to Koyeb (free)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-koyeb.yml'
+
+jobs:
+  deploy:
+    if: ${{ secrets.KOYEB_TOKEN != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Koyeb CLI
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/koyeb/koyeb-cli/v5.4.0/install.sh | sh
+          echo "$HOME/.koyeb/bin" >> "$GITHUB_PATH"
+
+      - name: Deploy image
+        env:
+          KOYEB_TOKEN: ${{ secrets.KOYEB_TOKEN }}
+        run: |
+          set -euo pipefail
+          APP="${KOYEB_APP:-life-tracker}"
+          SERVICE="${KOYEB_SERVICE:-life-tracker}"
+          IMAGE="ghcr.io/thekapilkhandelwal/life-tracker:latest"
+
+          if ! koyeb apps get "$APP" >/dev/null 2>&1; then
+            koyeb apps create "$APP"
+          fi
+
+          if koyeb services get "$APP/$SERVICE" >/dev/null 2>&1; then
+            koyeb services update "$APP/$SERVICE" \
+              --docker "$IMAGE" \
+              --instance-type free \
+              --regions fra \
+              --ports 8080:http \
+              --routes /:8080 \
+              --env PORT=8080 \
+              --env DEMO_LOGIN_ENABLED=true \
+              --env GOOGLE_OAUTH_ENABLED="${GOOGLE_OAUTH_ENABLED:-false}" \
+              --env COOKIE_SECURE=true \
+              --env COOKIE_SAME_SITE=None \
+              --env FRONTEND_URL="https://${APP}-*.koyeb.app" \
+              --env MONGODB_URI="${{ secrets.MONGODB_URI }}" \
+              --env JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+              --env GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
+              --env GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+              --checks "8080:http:/actuator/health"
+          else
+            koyeb services create "$SERVICE" \
+              --app "$APP" \
+              --docker "$IMAGE" \
+              --instance-type free \
+              --regions fra \
+              --ports 8080:http \
+              --routes /:8080 \
+              --env PORT=8080 \
+              --env DEMO_LOGIN_ENABLED=true \
+              --env GOOGLE_OAUTH_ENABLED=false \
+              --env COOKIE_SECURE=true \
+              --env COOKIE_SAME_SITE=None \
+              --env MONGODB_URI="${{ secrets.MONGODB_URI }}" \
+              --env JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+              --checks "8080:http:/actuator/health"
+          fi
