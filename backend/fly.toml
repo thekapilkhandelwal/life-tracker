@@ -1,0 +1,32 @@
+app = "life-tracker-kapil"
+primary_region = "bom"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  DEMO_LOGIN_ENABLED = "true"
+  GOOGLE_OAUTH_ENABLED = "false"
+  COOKIE_SECURE = "true"
+  COOKIE_SAME_SITE = "None"
+  FRONTEND_URL = "https://life-tracker-kapil.fly.dev"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "10s"
+    grace_period = "120s"
+    method = "GET"
+    path = "/actuator/health"
+
+[[vm]]
+  memory = "1gb"
+  cpu_kind = "shared"
+  cpus = 1
